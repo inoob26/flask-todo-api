@@ -7,6 +7,7 @@ BASEDIR = abspath(dirname(__name__))
 
 class Config:
     SECRET_KEY = getenv('SECRET_KEY')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     @staticmethod
     def init_app(app):

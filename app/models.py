@@ -1,6 +1,4 @@
 from . import db
-from sqlalchemy import Integer, ForeignKey, String, Column
-from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -39,7 +37,7 @@ class Todo(db.Model):
     id = db.Column(name='id', type_=db.Integer, primary_key=True)
     text = db.Column(name='text', type_=db.String(50))
     complete = db.Column(name='complete', type_=db.Boolean, default=False)
-    user_id = db.Column(name='user_id', type_=db.Integer, ForeignKey=('users.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     def to_json(self):
         return {
