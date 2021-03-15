@@ -1,5 +1,6 @@
-from . import db
+from . import db, ma
 from werkzeug.security import generate_password_hash, check_password_hash
+from marshmallow import fields, validate
 
 
 class User(db.Model):
@@ -8,7 +9,7 @@ class User(db.Model):
     username = db.Column(name='username', type_=db.String(64), unique=True)
     password_hash = db.Column(name='password', type_=db.String(128))
     admin_role = db.Column(name='admin_role', type_=db.Boolean, default=False)
-    todos = db.relationship("Todo", backref='user')
+    todos = db.relationship("app.models.Todo", backref='user')
 
     @property
     def password(self):
@@ -30,6 +31,16 @@ class User(db.Model):
 
     def __repr__(self):
         return f"<User>: id: {self.id}, username: {self.username}, admin {self.admin_role}"
+
+
+class UserSchema(ma.Schema):
+    class Meta:
+        model = User
+
+    id = fields.Integer(required=False)
+    username = fields.String(required=True, validate=[validate.Length(max=64)])
+    password = fields.String(required=True, validate=[validate.Length(max=80)])
+    admin_role = fields.Boolean(required=False)
 
 
 class Todo(db.Model):
