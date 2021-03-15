@@ -1,7 +1,7 @@
 from flask import jsonify, request, abort
 from . import api
 from .. import db
-from ..models import User, Todo, UserSchema
+from ..models import User, UserSchema
 from marshmallow.exceptions import ValidationError
 from .decorators import validate_request, admin_required
 from flask_jwt_extended import jwt_required
@@ -19,6 +19,7 @@ def get_all_users():
 
 
 @api.route('/user/<int:user_id>', methods=['GET'])
+@jwt_required()
 def get_user(user_id):
     user = User.query.get_or_404(user_id)
 
