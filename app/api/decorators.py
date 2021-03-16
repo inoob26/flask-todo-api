@@ -27,3 +27,18 @@ def admin_required():
             return f(*args, **kwargs)
         return decorator
     return wrapper
+
+
+def user_required():
+    def wrapper(f):
+        @wraps(f)
+        def decorator(*args, **kwargs):
+            verify_jwt_in_request()
+            claims = get_jwt()
+            
+            if not claims['sub']['user_id']:
+                abort(403, {'msg': 'user_id required'})
+
+            return f(claims['sub']['user_id'], *args, **kwargs)
+        return decorator
+    return wrapper

@@ -43,9 +43,15 @@ def forbidden(e):
 
 @api.errorhandler(404)
 def not_found(e):
-    response = jsonify({
-        'error': 'Not found'
-    })
+    if not e.description['msg']:
+        response = jsonify({
+            'error': 'Not found'
+        })
+    else:
+        response = jsonify({
+            'msg': e.description['msg']
+        })
+    
     response.status_code = 404
     
     return response

@@ -58,4 +58,13 @@ class Todo(db.Model):
         }
 
     def __repr__(self):
-        return f"<Todo>: id: {self.id}, text: {self.text}, complete: {self.complete}"
+        return f"<Todo>: id: {self.id}, user_id: {self.user_id} ,text: {self.text}, complete: {self.complete}"
+
+
+class TodoSchema(ma.Schema):
+    class Meta:
+        model = Todo
+
+    text = fields.String(required=False, validate=[validate.Length(max=50)])
+    complete = fields.Boolean(required=False, default=False)
+    user_id = fields.Integer(required=False)
