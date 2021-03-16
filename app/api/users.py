@@ -30,6 +30,7 @@ def get_user(user_id):
 
 @api.route('/user', methods=['POST'])
 @validate_request
+@jwt_required()
 @admin_required()
 def create_user():
     data = request.get_json()
@@ -60,9 +61,14 @@ def create_user():
 
 @api.route('/user/<int:user_id>', methods=['PUT'])
 @validate_request
+@jwt_required()
 @admin_required()
 def edit_user(user_id):
-    user = User.query.get_or_404(user_id)
+    user = User.query.filter_by(id=user_id).first()
+
+    if not user:
+        abort(404, {'msg': 'user not found'})
+
     data = request.get_json()
     schema = UserSchema()
 
@@ -83,3 +89,19 @@ def edit_user(user_id):
         'msg': 'user data has been changed'
     })
 
+
+@api.route('/user/<int:user_id>', methods=['DELETE'])
+@jwt_required()
+@admin_required()
+def delete_user(user_id):
+    user = User.query.filter_by(id=user_id).first()
+
+    if not user:
+        abort(404, {'msg': 'user not found'})
+
+    db.session.delete(user)
+    db.session.commit()
+
+    return jsonify({
+        'msg': f"user has been deleted"
+    })
