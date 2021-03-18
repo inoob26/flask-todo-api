@@ -75,9 +75,9 @@ def edit_user(user_id):
     try:
         new_data = schema.load(data)
 
-        user.username = new_data['username']
+        user.username = new_data.get('username', user.username)
         user.password = new_data['password']
-        user.admin_role = new_data['admin_role']
+        user.admin_role = new_data.get('admin_role', user.admin_role)
         
         db.session.add(user)
         db.session.commit()

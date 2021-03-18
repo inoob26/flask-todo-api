@@ -43,7 +43,7 @@ def forbidden(e):
 
 @api.errorhandler(404)
 def not_found(e):
-    if not e.description['msg']:
+    if isinstance(e.description, str) or not e.description['msg']:
         response = jsonify({
             'error': 'Not found'
         })
