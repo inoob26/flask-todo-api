@@ -11,6 +11,9 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=10)
     JWT_SECRET_KEY = getenv('JWT_SECRET_KEY')
+    
+    SWAGGER_URL = '/swagger'
+    API_URL = '/static/swagger.yaml'
 
     @staticmethod
     def init_app(app):

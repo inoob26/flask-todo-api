@@ -1,0 +1,345 @@
+openapi: 3.0.0
+info:
+  title: Flask User & Todo API
+  version: 0.0.1
+
+servers:
+  - url: /api/v1
+
+tags:
+  - name: Authorization
+  - name: user
+    description: user operation
+  - name: todo
+    description: todo operation
+
+paths:
+  /login:
+    get:
+      tags:
+      - Authorization
+      summary: Returns token
+      description: Token using for another paths
+      security:
+        - basicAuth: []
+      responses:
+        '200':    # status code
+          description: 'successful result'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: "user token"
+        '401':
+          description: 'Unauthorized'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    description: "error message"
+        '404':
+          description: 'User not found'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    description: "error message"
+  
+  /user:
+    get:
+      tags:
+        - user
+      summary: Returns a list of users.
+      security:
+        - token_auth: []
+      responses:
+        '200':
+          description: A JSON array of user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/UserDisplaySchema"
+        '401':
+          description: 'Authorization information is missing or invalid.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    description: "error message"
+    post:
+      tags:
+          - user
+      summary: add user "Administrator permission required"
+      security:
+        - token_auth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad request. User data is not valid
+        '409':
+          description: User already exists
+
+  /user/{user_id}:
+    get:
+      tags:
+        - user
+      operationId: getUserById
+      parameters:
+        - in: path
+          name: user_id
+          description: User ID
+          schema:
+            type: integer
+      summary: Returns user info by id.
+      security:
+        - token_auth: []
+      responses:
+        '200':
+          description: A JSON user info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDisplaySchema"
+        '401':
+          description: 'Authorization information is missing or invalid.'
+        '404':
+          description: 'user not found'
+    put:
+      tags:
+        - user
+      summary: edit user information "Administrator permission required"
+      security:
+        - token_auth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      produces:
+        - "application/json"
+      parameters:
+      - in: path
+        name: user_id
+        description: User ID
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: 'successful result'
+        '401':
+          description: 'Authorization information is missing or invalid.'
+        '404':
+          description: 'user not found'
+
+    delete:
+      tags:
+        - user
+      summary: remove user by id "Administrator permission required"
+      security:
+        - token_auth: []
+      parameters:
+        - in: path
+          name: user_id
+          description: User ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'successful result'
+        '401':
+          description: 'Authorization information is missing or invalid.'
+        '404':
+          description: 'user not found'
+  /todo:
+    get:
+      tags:
+        - todo
+      summary: Returns a list of todos.
+      security:
+        - token_auth: []
+      responses:
+        '200':
+          description: A JSON array of user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  todos:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/TodoDisplaySchema"
+        '401':
+          description: 'Authorization information is missing or invalid.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    description: "error message"
+    post:
+      tags:
+        - todo
+      summary: add todo
+      security:
+        - token_auth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Todo"
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad request. Todo data is not valid
+        '409':
+          description: User already exists
+  /todo/{todo_id}:
+    get:
+      tags:
+        - todo
+      parameters:
+        - in: path
+          name: todo_id
+          description: Todo ID
+          schema:
+            type: integer
+      summary: Returns todo info by id.
+      security:
+        - token_auth: []
+      responses:
+        '200':
+          description: A JSON todo info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Todo"
+        '401':
+          description: 'Authorization information is missing or invalid.'
+        '404':
+          description: 'todo not found'
+    put:
+      tags:
+        - todo
+      summary: Update todo.
+      security:
+        - token_auth: []
+      parameters:
+        - in: "path"
+          name: "todo_id"
+          required: true
+          description: Todo ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Todo"
+      responses:
+        '200':
+          description: 'successful result'
+        '400':
+          description: 'validation error'
+        '401':
+          description: 'Authorization information is missing or invalid.'
+        '404':
+          description: 'todo not found'
+    delete:
+      tags:
+        - todo
+      summary: Delete todo.
+      security:
+        - token_auth: []
+      parameters:
+        - in: "path"
+          name: "todo_id"
+          required: true
+          description: Todo ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'successful result'
+        '401':
+          description: 'Authorization information is missing or invalid.'
+        '404':
+          description: 'todo not found'
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    token_auth:
+      type: http
+      scheme: bearer
+
+  schemas:
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        admin_role:
+          type: boolean
+
+    UserDisplaySchema:
+      type: object
+      properties:
+        id: 
+          type: integer
+        username:
+          type: string
+        admin_role:
+          type: boolean
+
+    Todo:
+      type: object
+      properties:
+        text:
+          type: string
+        complete:
+          type: boolean
+
+    TodoDisplaySchema:
+      type: object
+      properties:
+        id:
+          type: integer
+        text:
+          type: string
+        complete:
+          type: boolean
