@@ -1,12 +1,19 @@
 from os import getenv
 from os.path import abspath, dirname, join
+from datetime import timedelta
 
 
 BASEDIR = abspath(dirname(__name__))
 
 
 class Config:
-    SECRET_KEY = getenv('SECRET_KEY')
+    SECRET_KEY = getenv('SECRET_KEY', 'supersecretkey')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=10)
+    JWT_SECRET_KEY = getenv('JWT_SECRET_KEY', 'supersecretkey2')
+    
+    SWAGGER_URL = '/swagger'
+    API_URL = '/static/swagger.yaml'
 
     @staticmethod
     def init_app(app):
